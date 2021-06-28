@@ -1,0 +1,19 @@
+#mysql:
+#  path: '127.0.0.1:3306'
+#  config: 'charset=utf8mb4&parseTime=True&loc=Local'
+#  dbName: 'hongbao'
+#  username: 'root'
+#  password: '123'
+#  max-idle-conns: 10
+#  max-open-conns: 10
+
+
+  kind: reverse  #命令类型，即:reverse命令
+  name: hongbao #数据库名
+  source:
+    database: mysql #数据库类型
+    conn_str: 'root:root@tcp(127.0.0.1:3306)/hongbao' #数据库DSN
+  targets:
+    - type: codes
+      language: golang
+      output_dir: C:\qianghongbao\pkg\sql #文件输出地址
