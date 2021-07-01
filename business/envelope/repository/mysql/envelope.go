@@ -1,4 +1,4 @@
-package repository
+package mysql
 
 //type Envelope struct {
 //	ID int  `gorm:"good_id"`
