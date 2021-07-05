@@ -7,22 +7,23 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-var db *gorm.DB
-var redisdb *redis.Conn
+var DB *gorm.DB
+var RedisDB redis.Conn
 
 func GetDB() *gorm.DB {
 	var err error
-	dsn := "root:123@tcp(127.0.0.1:3306)/hongbao?charset=utf8mb4&parseTime=True&loc=Local"
-	db,err =gorm.Open("mysql",dsn)
+	dsn := "root:root@tcp(127.0.0.1:3306)/hongbao?charset=utf8mb4&parseTime=True&loc=Local"
+	DB,err =gorm.Open("mysql",dsn)
 	if err != nil {
 		panic(err)
 	}
-	db.AutoMigrate(&EnvelopeDo{}, &Trade{}, &AccountDo{})
-	return db
+	DB.AutoMigrate(&EnvelopeDo{}, &Trade{}, &AccountDo{})
+	return DB
 }
 
 func GetRedis() {
-	c, err := redis.Dial("tcp", "localhost:6379")
+	var err error
+	RedisDB, err = redis.Dial("tcp", "localhost:6379")
 	if err != nil {
 		fmt.Println("conn redis failed,", err)
 		return
@@ -30,7 +31,7 @@ func GetRedis() {
 
 	fmt.Println("redis conn success")
 
-	defer c.Close()
+	//defer RedisDB.Close()
 }
 //func GetRedis() {
 //	// 实例化一个redis客户端

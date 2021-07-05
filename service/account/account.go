@@ -7,7 +7,6 @@ import (
 
 type AccountService struct {
 	account store.OperateAccount
-
 }
 
 func (accountService *AccountService) GetAccountById(ctx context.Context, id int) {
@@ -39,7 +38,7 @@ func (account *AccountService) IsLitterThenOperatingMone(ctx context.Context,id 
 
 //转账
 func (account *AccountService) Transfer(ctx context.Context,nowId int, targetId int, money float64) {
-
+	//转入中间商 //中间商再转出来
 }
 
 //账户加钱
