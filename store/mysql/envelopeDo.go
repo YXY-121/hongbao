@@ -31,7 +31,7 @@ func (a EnvelopeDo) TableName() string {
 
 func (a EnvelopeDo) SelectEnvelopeById(ctx context.Context, Id int) (*EnvelopeDo, error) {
 	hongbao := EnvelopeDo{}
-	err := db.Where("envelope_id=?", Id).First(&hongbao).Error
+	err := DB.Where("envelope_id=?", Id).First(&hongbao).Error
 	if err != nil {
 		return nil, nil
 	}
