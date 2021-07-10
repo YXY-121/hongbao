@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/shopspring/decimal"
 	_ "github.com/urfave/cli/v2"
-	"hongbao/apis"
+	"hongbao/store/mysql"
 	"math/rand"
 	"net/http"
 	"strings"
@@ -22,31 +22,47 @@ func disserilizabale(GetValue interface{},vo interface{})  interface{}{
 	return vo
 }
 func main()  {
-	r:=apis.APIRouter()
-	r.Run()
+	//r:=apis.APIRouter()
+	//r.Run()
 
 
-	//mysql.GetRedis()
-	//e:=mysql.EnvelopeDo{
-	//	EnvelopeId: 1,
-	//}
-	//
-	////jsonData, _ := json.Marshal(e)
-	//jsonData, _ := json.MarshalIndent(e, "", "   ")
-	//fmt.Println(string(jsonData))
-	//a,_:=mysql.RedisDB.Do("set","Aa1",string(jsonData))
-	//b,_:=mysql.RedisDB.Do("get","Aa1")
-	//fmt.Println(a)
+	mysql.GetRedis()
+	e:=mysql.EnvelopeDo{
+		EnvelopeId: 1,
+	}
+
+	//jsonData, _ := json.Marshal(e)
+	jsonData, _ := json.MarshalIndent(e, "", "   ")
+	fmt.Println(string(jsonData))
+	a,_:=mysql.RedisDB.Do("set","Aa1",string(jsonData))
+	b,_:=mysql.RedisDB.Do("get","Aa1")
+	fmt.Println(a)
+//	datalist := []map[string]interface{}{}
+	fmt.Println(GetString(b,""))
+	//json.Unmarshal([]byte(b),datalist)
 	//stu1:=disserilizabale(b,mysql.EnvelopeDo{})
 	//do := stu1.(mysql.EnvelopeDo)
-	//
-	//
+
+
 	//fmt.Println(do.EnvelopeId)
 
 
 
 
 }
+func GetString(str interface{}, d string) string {
+	if str == nil {
+		return d
+	}
+	switch str.(type) {
+	case string:
+		return str.(string)
+	case []byte:
+		return string(str.([]byte))
+	}
+	return fmt.Sprintf("%s", str)
+}
+
 
 func request()  {
 	req, err := http.NewRequest("GET", "https://apache.claz.org/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0-bin.tar.gz", nil)
