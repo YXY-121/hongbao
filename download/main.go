@@ -8,7 +8,20 @@ import (
 )
 
 func main() {
+
 	// 默认并发数
+//	reader:=strings.NewReader("a b c")
+//	f, err := os.OpenFile("goWriter.txt", os.O_APPEND, 0764)
+//	defer f.Close()
+//	if err != nil {
+//		fmt.Println("文件不存在,正在创建文件")
+//		f, _ = os.Create("goWriter.txt")
+//	}
+//	req,_:=http.NewRequest("get","https://apache.claz.org/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0-bin.tar.gz",nil)
+//	rep,_:=http.DefaultClient.Do(req)
+//	buf:=make([]byte,100)
+//	io.CopyBuffer(f,rep.Body,buf)
+//	fmt.Println(buf)
 	concurrencyN := runtime.NumCPU()
 
 	app := &cli.App{

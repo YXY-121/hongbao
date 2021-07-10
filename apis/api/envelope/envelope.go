@@ -1,9 +1,13 @@
 package apis
 
 import (
-	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"hongbao/service"
+	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
+	vo "hongbao/apis/dto"
+	"hongbao/service/envelope"
+	"strconv"
 	"time"
 )
 
@@ -19,12 +23,27 @@ type Envelope struct {
 //	UpdateTime time.Time
 }
 
-func CreateEnvelope(c *gin.Context,ctx context.Context,envelope *Envelope)  {
-	//e:=c.BindJSON(&Envelope{})
-	service.EnvelopeService.DivideHongbao(ctx,envelope)
+func CreateEnvelope(c *gin.Context)  {
 
+	number, _ := strconv.Atoi(c.PostForm("number"))
+	totalAmount, _ := decimal.NewFromString(c.PostForm("totalAmount"))
+	e:=vo.EnvelopeVo{
+		EnvelopeId:  uuid.New(),
+		Blessing:    c.PostForm("blessing"),
+		SenderId:    c.PostForm("senderId"),
+		Status:      c.PostForm("status"),
+		Number:      number,
+		TotalAmount: totalAmount,
+		CreateTime:  time.Now(),
+	}
 
+	eService := envelope.EnvelopeService{}
+	eService.DivideHongbao(&e)
+}
+func Hi(c *gin.Context)  {
 
+	fmt.Println(c.QueryMap("a"))
+	//c.Query("a")
 }
 
 

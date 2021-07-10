@@ -14,12 +14,12 @@ type EnvelopeDo struct {
 	UserName       string     `gorm:"column:user_name" json:"user_name"`             //发红包者名字
 	TotalAmount    float64    `gorm:"column:total_amount" json:"total_amount"`       //总金额
 	OneAmount      float64    `gorm:"column:one_amount" json:"one_amount"`           //单个红包金额
-	Quantity       int        `gorm:"column:quantity" json:"quantity"`               //红包个数
+	Number         int        `gorm:"column:number" json:"number"`                   //红包个数
 	RemainedAmount float64    `gorm:"column:remained_amount" json:"remained_amount"` //剩余金额
 	Status         int        `gorm:"column:status" json:"status"`                   //0可用 1过期不可用
-	ExpiredTime    *time.Time `gorm:"column:expired_time" json:"expired_time"`       //过期时间
-	CreateTime     *time.Time `gorm:"column:create_time" json:"create_time"`         //	创建时间
-	UpdateTime     *time.Time `gorm:"column:update_time" json:"update_time"`         //修改时间
+	ExpiredTime    time.Time `gorm:"column:expired_time" json:"expired_time"`       //过期时间
+	CreateTime     time.Time `gorm:"column:create_time" json:"create_time"`         //	创建时间
+	UpdateTime     time.Time `gorm:"column:update_time" json:"update_time"`         //修改时间
 
 	//
 
@@ -38,4 +38,3 @@ func (a EnvelopeDo) SelectEnvelopeById(ctx context.Context, Id int) (*EnvelopeDo
 	return &hongbao, nil
 
 }
-

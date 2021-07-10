@@ -1,17 +1,24 @@
 package apis
 
-//func APIRouter() *gin.Engine {
-//	//r:=gin.Default()
-//	//api:=r.Group("/api/v1")
-//	//api.GET("/get/:id",apis.CreateEnvelope)
-//	//r.GET("/getUser/:id",apis.GetUser)
-//	//
-//	//r.POST("/createGood",apis.AddGood)
-//	//r.GET("/getGood/:id",apis.GetGood)
-//	//r.GET("/getGoods/",apis.GetGoodList)
-//
-//
-//
-//
-//	//return r
-//}
+import (
+	"github.com/gin-gonic/gin"
+	apis "hongbao/apis/api/envelope"
+)
+
+func APIRouter() *gin.Engine {
+	r:=gin.Default()
+
+
+	v1 := r.Group("/v1")
+	{
+		v1.GET("/login", apis.Hi)
+
+		//创建红包
+		v1.POST("/CreateEnvelope", apis.CreateEnvelope)
+
+	}
+
+
+	return r
+}
+

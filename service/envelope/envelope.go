@@ -2,14 +2,18 @@ package envelope
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
-	apis "hongbao/apis/api/envelope"
+	"hongbao/apis/dto"
 	"hongbao/store"
 	"hongbao/store/mysql"
 	"math/rand"
+	"time"
 )
 
-type envelopeService struct {
+type EnvelopeService struct {
 	envelopeDao store.OperateEnvelope
 }
 type EnvelopeDTO struct {
@@ -21,60 +25,91 @@ type EnvelopeVo struct {
 	EnvelopeId int//红包id
 	SenderId int //发送者
 	blessing string //祝福
+	Number int //个数
 	TotalAmount decimal.Decimal //总金额
+	RemainedAmount decimal.Decimal//剩的 如果剩的>0，就去拿红包小项、
 }
 //红包项
 type EnvelopeItemVo struct {
-	EnvelopeId int//所属大红包id
-	EnvelopeItemId int//红包item
+	EnvelopeId uuid.UUID//所属大红包id
+	EnvelopeItemId uuid.UUID//红包item
 	AccepterId int//接收者
 	ItemAmount decimal.Decimal//单个红包金额
 }
 
 //分配红包红包类型生成响应的红包数量、以及money\生成红包
-func (e *envelopeService) DivideHongbao(ctx context.Context, envelope *apis.Envelope) {
-	////过期时间
-	//envelopeId := uuid.UUID{}
-	//
-	//expiredTime := envelope.CreateTime.Add(24 * time.Hour)
-	//updateTime := envelope.CreateTime
-	//if envelope.EnvelopeType == 1 { //普通红包用一个红包id搞定
-	//	//单个金额
-	//	singleAmount := envelope.TotalAmount / float64(envelope.Quantity)
-	//} else { //随机红包
-	//	randomCreateHongbao(envelope.TotalAmount, envelope.Quantity)
-	//}
+func (e *EnvelopeService) DivideHongbao(evo *vo.EnvelopeVo) {
+	//设置过期时间
+	expiredTime := evo.CreateTime.Add(24 * time.Hour)
+	updateTime := evo.CreateTime
+	amounts := make([]decimal.Decimal, evo.Number)
 
+	if evo.Status == "1" { //普通红包用一个红包id搞定
+		//单个金额
+		singleAmount := evo.TotalAmount.Div(decimal.NewFromInt(int64(evo.Number)))
+		for i:=0;i<evo.Number;i++ {
+			amounts=append(amounts,singleAmount)
+		}
+
+	} else {
+	//	amounts = RandomCreateHongbao(evo.TotalAmount, evo.Number)
+	}
+	//生成红包小项
+
+//	EnvelopeItemList:=CreateEnvelopeItem(evo.EnvelopeId, amounts)
+	//fmt.Println(EnvelopeItemList)
+	//红包小项插入缓存、数据库
+	//将当前的值插入缓存
+	evoj,_:=json.Marshal(evo)
+	edo:=new(mysql.EnvelopeDo)
+	json.Unmarshal(evoj,edo)
+	edo.ExpiredTime=expiredTime
+	edo.UpdateTime=updateTime
+	fmt.Println(edo)
+	fmt.Println(evoj)
+	fmt.Println(evo)
+
+
+	//红包大项插入缓存、数据库
 }
 
-//提前生成好红包
-func RandomCreateHongbao(totalAmount float64, quantity int) []decimal.Decimal{
-	now := decimal.NewFromFloat(totalAmount)
-	hongbaoList := make([]decimal.Decimal, quantity)
-
-	for i := 0; i < quantity-1; i++ {
-		max := decimal.NewFromFloat((totalAmount / float64(quantity)) * 2)
-		ran := decimal.NewFromFloat(rand.Float64())
-		value := max.Mul(ran)
-		if value.LessThan(decimal.NewFromFloat(0.01)) {
-			value = decimal.NewFromFloat(0.01)
-
-		} else {
-			value = value.Mul(decimal.NewFromInt(100)).Div(decimal.NewFromInt(100))
-
+//生成红包小项
+func CreateEnvelopeItem(EnvelopeId uuid.UUID,amounts []decimal.Decimal) []EnvelopeItemVo {
+	EnvelopeItemList:=make([]EnvelopeItemVo, len(amounts))
+	for i:=0;i< len(amounts);i++ {
+		itemVo := EnvelopeItemVo{
+			EnvelopeId:     EnvelopeId, //所属大红包id
+			EnvelopeItemId: uuid.New(), //红包item
+			ItemAmount:     amounts[i], //单个红
 		}
-		hongbaoList = append(hongbaoList, value)
-		quantity--
-		now.Sub(value)
+		EnvelopeItemList=append(EnvelopeItemList,itemVo)
 
 	}
+	return EnvelopeItemList
+}
+//每次抢的时候就--，抢的时候生成小红包的信息。
+func randomMoney(restAmount int, restNumber int) decimal.Decimal{
 
-	hongbaoList = append(hongbaoList, now.Mul(decimal.NewFromInt(100)).Div(decimal.NewFromInt(100)))
-	return hongbaoList
+		amount := rand.Intn(restAmount/restNumber*2-1) + 1
+		restAmount-=amount
+		v:=decimal.NewFromInt(int64(amount))
+		fmt.Println(v)
+		fmt.Println(amount)
+
+	return v
 }
 
+func RandomCreateHongbao(hongbaoId string)  {
+	//从缓存中获取当前的number和amount，
+	mysql.RedisDB.Do("get"+ hongbaoId)
+	//获取大红包id的库存
+	//并生成randomMoney
+	//在库存中number减去1，amount-randomMoney
+}
+
+
 //红包的首页：红包的金额、红包数量、发红包的人名字、红包的主福、当前剩余总书、:抢到的人的名字、金额
-func (e *envelopeService) GetHongbaoMessage(ctx context.Context, envelopeId int) (*mysql.EnvelopeDo, error) {
+func (e *EnvelopeService) GetHongbaoMessage(ctx context.Context, envelopeId int) (*mysql.EnvelopeDo, error) {
 	//获取大红包
 
 	//获取红包小项们

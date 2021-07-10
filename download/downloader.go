@@ -3,17 +3,17 @@
 package main
 
 import (
-"fmt"
-"io"
-"log"
-"net/http"
-"os"
-"path"
-"strings"
-"sync"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"path"
+	"strings"
+	"sync"
 
-"github.com/k0kubun/go-ansi"
-"github.com/schollz/progressbar/v3"
+	"github.com/k0kubun/go-ansi"
+	"github.com/schollz/progressbar/v3"
 )
 
 type Downloader struct {
@@ -69,17 +69,17 @@ func (d *Downloader) multiDownload(strURL, filename string, contentLen int) erro
 				rangeEnd = contentLen
 			}
 
-			downloaded := 0
-			if d.resume {
-				partFileName := d.getPartFilename(filename, i)
-				content, err := os.ReadFile(partFileName)
-				if err == nil {
-					downloaded = len(content)
-				}
-				d.bar.Add(downloaded)
-			}
+			//downloaded := 0
+			//if d.resume {
+			//	partFileName := d.getPartFilename(filename, i)
+			//	content, err := os.ReadFile(partFileName)
+			//	if err == nil {
+			//		downloaded = len(content)
+			//	}
+			//	d.bar.Add(downloaded)
+			//}
 
-			d.downloadPartial(strURL, filename, rangeStart+downloaded, rangeEnd, i)
+			d.downloadPartial(strURL, filename, rangeStart, rangeEnd, i)
 
 		}(i, rangeStart)
 
@@ -140,6 +140,9 @@ func (d *Downloader) merge(filename string) error {
 
 	for i := 0; i < d.concurrency; i++ {
 		partFileName := d.getPartFilename(filename, i)
+		fmt.Println(partFileName)
+		partDir:=d.getPartDir(filename)
+		fmt.Println(partDir)
 		partFile, err := os.Open(partFileName)
 		if err != nil {
 			return err
@@ -152,12 +155,14 @@ func (d *Downloader) merge(filename string) error {
 	return nil
 }
 
-// getPartDir 部分文件存放的目录
+// getPartDir 部分文件存放的目录、apache-zookeeper-3
 func (d *Downloader) getPartDir(filename string) string {
 	return strings.SplitN(filename, ".", 2)[0]
 }
 
 // getPartFilename 构造部分文件的名字
+//apache-zookeeper-3/apache-zookeeper-3.7.0-bin.tar.gz-5
+//apache-zookeeper-3/apache-zookeeper-3.7.0-bin.tar.gz-6
 func (d *Downloader) getPartFilename(filename string, partNum int) string {
 	partDir := d.getPartDir(filename)
 	return fmt.Sprintf("%s/%s-%d", partDir, filename, partNum)

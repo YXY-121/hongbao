@@ -1,31 +1,53 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/shopspring/decimal"
-	_"github.com/urfave/cli/v2"
+	_ "github.com/urfave/cli/v2"
+	"hongbao/apis"
 	"math/rand"
 	"net/http"
-	"os"
 	"strings"
 )
 
+type s struct {
+	a int `json:"a"`
+	b string `json:"b"`
+}
+func disserilizabale(GetValue interface{},vo interface{})  interface{}{
+	str:=GetValue.([]byte)
+	json.Unmarshal(str,&vo)
+	return vo
+}
 func main()  {
-//		mysql.GetDB()
-//		mysql.GetRedis()
+	r:=apis.APIRouter()
+	r.Run()
 
-	resp, err := http.Head("https://studygolang.com/dl/golang/go1.16.5.src.tar.gz")
-	fmt.Println(resp,err)
-//	testFlag()
-	//request()
-	fmt.Sprintf("%s/%s-%d", "ss", "aaa", 1)
-	os.Mkdir("a",0777)
+
+	//mysql.GetRedis()
+	//e:=mysql.EnvelopeDo{
+	//	EnvelopeId: 1,
+	//}
+	//
+	////jsonData, _ := json.Marshal(e)
+	//jsonData, _ := json.MarshalIndent(e, "", "   ")
+	//fmt.Println(string(jsonData))
+	//a,_:=mysql.RedisDB.Do("set","Aa1",string(jsonData))
+	//b,_:=mysql.RedisDB.Do("get","Aa1")
+	//fmt.Println(a)
+	//stu1:=disserilizabale(b,mysql.EnvelopeDo{})
+	//do := stu1.(mysql.EnvelopeDo)
+	//
+	//
+	//fmt.Println(do.EnvelopeId)
 
 
 
 
 }
+
 func request()  {
 	req, err := http.NewRequest("GET", "https://apache.claz.org/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0-bin.tar.gz", nil)
 	if err != nil {
